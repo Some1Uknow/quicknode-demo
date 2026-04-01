@@ -49,11 +49,31 @@
   letter-spacing: 0.05em;
 }
 
-.tagline {
+.poweredBy {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin-left: 18px;
   color: var(--muted);
   font-family: var(--mono);
   font-size: 12px;
+}
+
+.poweredByLabel {
+  white-space: nowrap;
+}
+
+.quickNodeLogo {
+  display: inline-flex;
+  align-items: center;
+  color: #ffffff;
+  line-height: 0;
+}
+
+.quickNodeLogo svg {
+  width: 108px;
+  height: auto;
+  display: block;
 }
 
 .inputRow {

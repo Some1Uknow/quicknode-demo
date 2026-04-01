@@ -1,4 +1,5 @@
 import styles from "./inspector.module.css";
+import QuickNodeLogo from "./QuickNodeLogo";
 
 export default function InspectorHeader() {
   return (
@@ -8,7 +9,12 @@ export default function InspectorHeader() {
         <h1 className={styles.title}>solana-inspector</h1>
       </div>
 
-      <p className={styles.tagline}>{"// powered by quicknode rpc"}</p>
+      <div className={styles.poweredBy}>
+        <span className={styles.poweredByLabel}>{"// powered by"}</span>
+        <span className={styles.quickNodeLogo}>
+          <QuickNodeLogo />
+        </span>
+      </div>
     </header>
   );
 }
