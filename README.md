@@ -1,36 +1,97 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Solana Inspector
 
-## Getting Started
+A simple Next.js example that inspects a Solana wallet with a QuickNode RPC endpoint.
 
-First, run the development server:
+It shows:
+
+- SOL balance
+- SPL tokens
+- recent transactions
+- basic network stats
+
+The frontend calls `/api/inspect`. The API route calls Solana JSON-RPC on the server. Your RPC URL stays in `.env.local`.
+
+## Quick start
+
+```bash
+npm install
+cp .env.example .env.local
+```
+
+Add your QuickNode endpoint to `.env.local`:
+
+```bash
+QUICKNODE_RPC_URL=https://your-endpoint.solana-mainnet.quiknode.pro/your-token/
+```
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+Build for production:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm run start
+```
 
-## Learn More
+## API example
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+curl "http://localhost:3000/api/inspect?address=7vfCXTUXx5W6PqKeLh4gYh4v6Qw4K8rL8U2rJ7n3B1yH"
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Core RPC example
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```js
+export async function callSolanaRpc(method, params = []) {
+  const response = await fetch(process.env.QUICKNODE_RPC_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      jsonrpc: "2.0",
+      id: 1,
+      method,
+      params,
+    }),
+  });
 
-## Deploy on Vercel
+  const json = await response.json();
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+  if (json.error) {
+    throw new Error(json.error.message);
+  }
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+  return json.result;
+}
+```
+
+## Files to read
+
+- `app/api/inspect/route.js`
+- `lib/solana/rpc.js`
+- `lib/solana/inspector.js`
+- `components/inspector/InspectorApp.js`
+
+## RPC methods used
+
+- `getBalance`
+- `getTokenAccountsByOwner`
+- `getSignaturesForAddress`
+- `getSlot`
+- `getRecentPerformanceSamples`
+
+## Docs
+
+- [QuickNode Solana Quickstart](https://www.quicknode.com/docs/solana/quickstart)
+- [QuickNode Solana API Overview](https://www.quicknode.com/docs/solana/api-overview)
+- [Solana `getBalance` RPC docs](https://solana.com/docs/rpc/http/getbalance)
+- [Next.js App Router docs](https://nextjs.org/docs/app)
+
+## Notes
+
+- If `QUICKNODE_RPC_URL` is missing, the app falls back to `https://api.mainnet-beta.solana.com`.
+- The address check is intentionally simple so the example stays easy to follow.
+- Each panel can fail independently, so one RPC error does not hide the rest of the page.
